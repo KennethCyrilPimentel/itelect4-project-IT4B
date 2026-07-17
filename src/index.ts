@@ -1,77 +1,88 @@
-// At the TOP of src/index.ts
-import type { User, Course, Submission } from "../types/index";
-// ... (your previous code) ...
-// ===== USING INTERFACES =====
-const student: User = {
-id: 1,
-name: "Juan dela Cruz",
-email: "juan@example.com",
-role: "student",
-isActive: true,
+import type { User, Shoot, ApiResponse } from "../types/index";
+import { ShootStatus } from "../types/index";
+
+const client: User = {
+  id: 1,
+  name: "Juan dela Cruz",
+  email: "juan@example.com",
+  role: "client",
+  isActive: true,
 };
-const course: Course = {
-code: "ITELECT4",
-title: "IT Elective 4",
-units: 3,
-semester: "1st Semester 2026-2027",
+
+const engagementShoot: Shoot = {
+  id: 1,
+  clientId: 1,
+  photographerId: 2,
+  type: "engagement",
+  status: ShootStatus.Confirmed, // was: "confirmed"
+  scheduledDate: new Date("2026-08-15"),
+  location: "Lipa City",
+  price: 5000,
 };
-console.log(student);
-console.log(course);
 
-// ===== PRIMITIVE TYPE ANNOTATIONS =====
-// Variables with explicit types
-const projectName: string = "itelect4-project";
-const currentYear: number = 2026;
-const isFullStack: boolean = true;
-const nothing: null = null;
-const notSet: undefined = undefined;
-// Function: typed parameters + typed return value
-function greet(name: string, year: number): string {
-return `Welcome to ${name} -- AY ${year}!`;
-}
-// void: function that does NOT return a value
-function logMessage(message: string): void {
-console.log(message);
-}
-logMessage(greet(projectName, currentYear));
+const userResponse: ApiResponse<User> = {
+  success: true,
+  data: client,
+};
 
-// ===== SPECIAL TYPES =====
-// any -- disables TypeScript type checking
-// [!] Avoid using this; it defeats the purpose of TypeScript
-let anything: any = "hello";
-anything = 42; // No error
-anything = true; // No error
-// unknown -- the safer version of any
-// You MUST check the type before using it
-let userInput: unknown = "test";
-if (typeof userInput === "string") {
-console.log(userInput.toUpperCase()); // OK -- TypeScript knows it's a string here
-}
-// never -- a function that NEVER returns
-// Used when a function always throws an error or loops forever
-function throwError(message: string): never {
-throw new Error(message);
+const shootListResponse: ApiResponse<Shoot[]> = {
+  success: true,
+  data: [engagementShoot],
+};
+
+console.log(userResponse.data.name); // Juan dela Cruz
+console.log(shootListResponse.data[0]?.location); // Lipa City
+
+// ===== GENERIC FUNCTIONS =====
+// T is inferred automatically from whatever array you pass in
+function getFirst<T>(items: T[]): T | undefined {
+  return items[0];
 }
 
-// ===== TYPE NARROWING =====
-import type { StringOrNumber } from "../types/index";
-// Narrowing with typeof
-// Without the if-check, TypeScript would error:
-// Property 'toUpperCase' does not exist on type 'number'
-function processInput(input: StringOrNumber): string {
-if (typeof input === "string") {
-return input.toUpperCase(); // TypeScript knows: input is string here
+// Constrained generic -- T must have an "id: number" field
+function getById<T extends { id: number }>(
+  items: T[],
+  id: number
+): T | undefined {
+  return items.find((item) => item.id === id);
 }
-return input.toFixed(2); // TypeScript knows: input is number here
-}
-// Narrowing with instanceof
-// Used with class instances like Date, Error, etc.
-function formatDate(value: string | Date): string {
-if (value instanceof Date) {
-return value.toLocaleDateString(); // TypeScript knows: it's a Date
-}
-return value; // TypeScript knows: it's a string
-}
-console.log(processInput("hello")); // HELLO
-console.log(processInput(3.14159)); // 3.14
-console.log(formatDate(new Date())); // e.g. 7/4/2026
+
+// Using them with YOUR entities, not the class demo's
+const firstShoot = getFirst<Shoot>([engagementShoot]);
+const foundShoot = getById<Shoot>([engagementShoot], 1);
+
+console.log(firstShoot?.location);  // Lipa City
+console.log(foundShoot?.price);     // 5000
+
+// ===== USING UTILITY TYPES =====
+import type { ShootUpdate, ShootPreview, PublicUser, RoleCount } from "../types/index";
+
+// Partial<T> -- update payload only needs the changed fields
+const patch: ShootUpdate = { status: ShootStatus.Completed }; // was: "completed"
+
+// Pick<T,K> -- a lightweight preview object, e.g. for a shoot list view
+const preview: ShootPreview = {
+  id: 1,
+  type: "engagement",
+  status: ShootStatus.Confirmed, // was: "confirmed"
+  scheduledDate: new Date("2026-08-15"),
+};
+
+// Omit<T,K> -- safe to expose publicly (no email, no isActive, no faqs)
+const publicProfile: PublicUser = {
+  id: 1,
+  name: "Juan dela Cruz",
+  role: "client",
+};
+
+// Record<K,T> -- dashboard-style counts
+const roleCount: RoleCount = { client: 30, photographer: 5, admin: 2 };
+
+console.log(patch);
+console.log(preview.type);
+console.log(publicProfile.name);
+console.log(roleCount.photographer);
+
+// ===== USING ENUMS =====
+console.log(ShootStatus[engagementShoot.status]); // "Confirmed" -- reverse mapping
+console.log(engagementShoot.status === ShootStatus.Confirmed); // true

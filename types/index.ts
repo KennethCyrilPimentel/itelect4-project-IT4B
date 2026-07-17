@@ -1,63 +1,88 @@
 // ===== INTERFACES =====
 // An interface defines the SHAPE of an object -- what fields it must have.
+
 export interface User {
-id: number;
-name: string;
-email: string;
-role: "student" | "admin" | "instructor"; // only these values
-isActive: boolean;
+  id: number;
+  name: string;
+  email: string;
+  role: "client" | "photographer" | "admin"; // only these values
+  isActive: boolean;
+  faqs?: { question: string; answer: string }[]; // photographer only
 }
-export interface Course {
-code: string;
-title: string;
-units: number;
-semester: string;
+
+export interface Shoot {
+  id: number;
+  clientId: number;
+  photographerId: number;
+  type: string;
+  status: ShootStatus; // was: "requested" | "confirmed" | "completed" | "cancelled"
+  scheduledDate: Date;
+  location: string;
+  price: number;
 }
-export interface Submission {
-id: number;
-studentId: number;
-courseCode: string;
-repoUrl: string;
-submittedAt: Date;
-score?: number; // ? means this field is optional
+
+export interface Deliverable {
+  id: number;
+  shootId: number;
+  batchName: string;
+  status: "raw" | "editing" | "delivered";
+  fileCount: number;
+  deliveredAt?: Date; // optional -- only set once delivered
 }
+
+// ===== GENERIC INTERFACE =====
+// ApiResponse<T> can wrap ANY data type -- every future GT reuses this
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+}
+
+// ===== UTILITY TYPES =====
+
+// Partial<T> -- every field becomes optional (perfect for update payloads)
+export type ShootUpdate = Partial<Shoot>;
+
+// Pick<T, K> -- keep ONLY the listed fields
+export type ShootPreview = Pick<Shoot, "id" | "type" | "status" | "scheduledDate">;
+
+// Omit<T, K> -- keep every field EXCEPT the listed ones
+export type PublicUser = Omit<User, "email" | "isActive" | "faqs">;
+
+// Record<K, T> -- a fixed set of keys, each mapped to the same value type
+export type RoleCount = Record<"client" | "photographer" | "admin", number>;
+
 
 // ===== TYPE ALIASES =====
 // A type alias gives a name to any type -- primitives, unions, functions, objects
+
 // Alias for a union type (string OR number)
 export type ID = number | string;
+
 // Alias for an object shape
 export type Coordinate = {
-x: number;
-y: number;
+  x: number;
+  y: number;
 };
+
 // Alias for a function signature
 export type Formatter = (value: number) => string;
-// Using them
-const studentId: ID = "S2026-001";
-const position: Coordinate = { x: 10, y: 20 };
-const formatScore: Formatter = (value) => `${value}%`;
-console.log(studentId); // S2026-001
-console.log(formatScore(95.5)); // 95.5%
 
 // ===== UNION TYPES -- One OR the other =====
 export type StringOrNumber = string | number;
-export type Status = "pending" | "active" | "inactive"; // literal union
+
 // Function that accepts a union type
 export function printId(id: StringOrNumber): void {
-console.log(`ID: ${id}`);
+  console.log(`ID: ${id}`);
 }
-printId(101);
-printId("S2026-001");
-// ===== INTERSECTION TYPES -- combines ALL properties =====
-// StudentWithCourse must have all User fields AND enrolledCourse AND gpa
-export type StudentWithCourse = User & {
-enrolledCourse: Course;
-gpa: number;
-};
-const topStudent: StudentWithCourse = {
-id: 1, name: "Maria Santos", email: "m@example.com",
-role: "student", isActive: true,
-enrolledCourse: { code: "ITELECT4", title: "IT Elective 4", units: 3, semester: "1st" },
-gpa: 1.25,
-};
+
+// ===== ENUMS =====
+// Regular enum -- exists at runtime; can be looped over or reverse-mapped
+// Good fit here since you'll likely build a status dropdown/filter later
+export enum ShootStatus {
+  Requested,
+  Confirmed,
+  Completed,
+  Cancelled,
+}
+
