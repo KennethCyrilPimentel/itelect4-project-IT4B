@@ -1,54 +1,75 @@
-# Shutterbook — Photo Gig Booking Tracker
+# React + TypeScript + Vite
 
-## Project Concept
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-Shutterbook is a booking and delivery management tool for
-freelance photographers and their clients. Clients can request photo
-shoots (weddings, events, portraits), photographers can accept and
-manage bookings, and both sides can track the status of a shoot from
-initial request through to delivery of the final edited photos. The
-app also includes a lightweight FAQ feature so clients can get instant
-answers to common questions (turnaround time, pricing, policies)
-without waiting for a manual reply.
+Currently, two official plugins are available:
 
-Core user roles: **client**, **photographer**, and **admin**.
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-## Interfaces & Types Defined So Far
+## React Compiler
 
-### Interfaces
-- `User` — represents a client, photographer, or admin account
-- `Shoot` — a booking request/session, with a status lifecycle
-- `Deliverable` — a batch of edited photos tied to a completed shoot
-- `ApiResponse<T>` — generic wrapper for API responses (success, data, message)
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-### Utility Types
-- `ShootUpdate` — `Partial<Shoot>`, for partial update payloads
-- `ShootPreview` — `Pick<Shoot, "id" | "type" | "status" | "scheduledDate">`, for list views
-- `PublicUser` — `Omit<User, "email" | "isActive" | "faqs">`, for public-facing profiles
-- `RoleCount` — `Record<"client" | "photographer" | "admin", number>`, for dashboard stats
+## Expanding the ESLint configuration
 
-### Type Aliases
-- `ID` — `number | string`
-- `Coordinate` — `{ x: number; y: number }`
-- `Formatter` — `(value: number) => string`
-- `StringOrNumber` — `string | number`
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-### Enums
-- `ShootStatus` — regular enum: `Requested`, `Confirmed`, `Completed`, `Cancelled`
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-### Generic Functions
-- `getFirst<T>(items: T[]): T | undefined`
-- `getById<T extends { id: number }>(items: T[], id: number): T | undefined`
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-## How to Install and Run
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 
-```bash
-npm install
-npx ts-node src/index.ts
 ```
 
-To type-check without producing output:
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```bash
-npx tsc --noEmit
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
+
 ```

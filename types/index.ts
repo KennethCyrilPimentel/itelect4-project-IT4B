@@ -86,3 +86,11 @@ export enum ShootStatus {
   Cancelled,
 }
 
+// Const enum -- inlined at compile time, no runtime object generated
+// Mirrors the same values already used in User.role
+export const enum Role {
+  Client = "client",
+  Photographer = "photographer",
+  Admin = "admin",
+}
+
