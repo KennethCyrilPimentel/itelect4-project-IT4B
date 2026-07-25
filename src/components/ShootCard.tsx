@@ -1,5 +1,6 @@
 // src/components/ShootCard.tsx
 import type { Shoot } from "../../types/index";
+import { ShootStatus } from "../../types/index";
 
 interface ShootCardProps {
   shoot: Shoot;
@@ -10,7 +11,7 @@ function ShootCard({ shoot }: ShootCardProps) {
     <div className="shoot-card">
       <h3>{shoot.type}</h3>
       <p>{shoot.location}</p>
-      <p>Status: {shoot.status}</p>
+      <p>Status: {ShootStatus[shoot.status]}</p>
     </div>
   );
 }
