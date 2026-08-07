@@ -11,10 +11,15 @@ const DeliverableBadge: React.FC<DeliverableBadgeProps> = ({
   children,
 }) => {
   return (
-    <div className="deliverable-badge">
-      <p>Batch: {deliverable.batchName}</p>
-      <p>Files: {deliverable.fileCount}</p>
-      <p>
+    <div className="rounded-lg border border-gray-200 bg-white p-5
+      shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <p className="text-gray-900 dark:text-white">
+        Batch: {deliverable.batchName}
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        Files: {deliverable.fileCount}
+      </p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
         Delivered:{" "}
         {deliverable.deliveredAt
           ? deliverable.deliveredAt.toLocaleDateString()
