@@ -1,12 +1,21 @@
 import type { Shoot } from "../../types/index";
+import { ShootStatus } from "../../types/index"; // <-- NEW
 
 interface ShootCardProps {
   shoot: Shoot;
-  variant?: "default" | "compact";      // NEW: the optional variant prop
+  variant?: "default" | "compact";
 }
 
+// NEW: maps each enum value back to a readable label
+const statusLabels: Record<ShootStatus, string> = {
+  [ShootStatus.Requested]: "Requested",
+  [ShootStatus.Confirmed]: "Confirmed",
+  [ShootStatus.Completed]: "Completed",
+  [ShootStatus.Cancelled]: "Cancelled",
+};
+
 function ShootCard({ shoot, variant = "default" }: ShootCardProps) {
-  const isCompact = variant === "compact";   // NEW
+  const isCompact = variant === "compact";
 
   return (
     <div className={`rounded-lg border border-gray-200 bg-white shadow-sm
@@ -15,11 +24,11 @@ function ShootCard({ shoot, variant = "default" }: ShootCardProps) {
         ${isCompact ? "text-sm" : "text-lg"}`}>
         {shoot.type}
       </h3>
-      {!isCompact && (                     // NEW: compact hides the location
+      {!isCompact && (
         <p className="text-gray-600 dark:text-gray-300">{shoot.location}</p>
       )}
       <p className="text-sm text-gray-500 dark:text-gray-400">
-        Status: {shoot.status}
+        Status: {statusLabels[shoot.status]} {/* <-- was shoot.status */}
       </p>
     </div>
   );
