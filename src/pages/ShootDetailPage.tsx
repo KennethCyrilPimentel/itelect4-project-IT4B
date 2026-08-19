@@ -1,21 +1,28 @@
 // src/pages/ShootDetailPage.tsx
+import { useQuery } from "@tanstack/react-query";
 import { useParams, useNavigate } from "react-router";
+import type { ApiShoot } from "../../types/index";
 import ShootCard from "../components/ShootCard";
-import { allShoots } from "../data/mockData";
+import { fetchShootById } from "../api/client";
 
 function ShootDetailPage() {
-  // Reads whatever is in the :id slot of the URL -- always a string
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // Shoot.id is a number, but everything read from the URL is a
-  // string -- so we convert before comparing
-  const shoot = allShoots.find((s) => s.id === Number(id));
+  const { data, isPending, isError, error } = useQuery<ApiShoot>({
+    queryKey: ["shoots", id],
+    queryFn: () => fetchShootById(id!),
+    enabled: id !== undefined,
+  });
 
-  if (shoot === undefined) {
+  if (isPending) {
+    return <div className="animate-pulse p-6 text-gray-500">Loading shoot...</div>;
+  }
+
+  if (isError) {
     return (
       <div className="rounded-lg bg-red-50 p-4 text-red-700">
-        No shoot found with id "{id}".
+        {error.message}
       </div>
     );
   }
@@ -23,11 +30,11 @@ function ShootDetailPage() {
   return (
     <div>
       <h2 className="mb-4 text-2xl font-bold text-gray-900 dark:text-white">
-        {shoot.type} -- {shoot.location}
+        {data.type} -- {data.location}
       </h2>
 
       <div className="max-w-sm">
-        <ShootCard shoot={shoot} />
+        <ShootCard shoot={data} />
       </div>
 
       <button onClick={() => navigate("/shoots")}

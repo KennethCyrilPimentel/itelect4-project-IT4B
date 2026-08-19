@@ -1,8 +1,8 @@
 // src/components/DeliverableBadge.tsx
-import type { Deliverable } from "../../types/index";
+import type { ApiDeliverable } from "../../types/index";
 
 interface DeliverableBadgeProps {
-  deliverable: Deliverable;
+  deliverable: ApiDeliverable;
   children?: React.ReactNode;
 }
 
@@ -22,7 +22,7 @@ const DeliverableBadge: React.FC<DeliverableBadgeProps> = ({
       <p className="text-sm text-gray-500 dark:text-gray-400">
         Delivered:{" "}
         {deliverable.deliveredAt
-          ? deliverable.deliveredAt.toLocaleDateString()
+          ? new Date(deliverable.deliveredAt).toLocaleDateString()
           : "Not yet delivered"}
       </p>
       {children}

@@ -1,0 +1,88 @@
+{
+  "shoots": [
+    {
+      "id": "1",
+      "clientId": 2,
+      "photographerId": 1,
+      "type": "Wedding",
+      "status": 1,
+      "scheduledDate": "2026-09-05T09:00:00.000Z",
+      "location": "Tagaytay",
+      "price": 15000
+    },
+    {
+      "id": "2",
+      "clientId": 3,
+      "photographerId": 1,
+      "type": "Debut",
+      "status": 0,
+      "scheduledDate": "2026-09-12T09:00:00.000Z",
+      "location": "Batangas City",
+      "price": 12000
+    },
+    {
+      "id": "3",
+      "clientId": 4,
+      "photographerId": 1,
+      "type": "Corporate Event",
+      "status": 2,
+      "scheduledDate": "2026-08-01T09:00:00.000Z",
+      "location": "Lipa City",
+      "price": 20000
+    },
+    {
+      "id": "4",
+      "clientId": 5,
+      "photographerId": 1,
+      "type": "Cosplay",
+      "status": 1,
+      "scheduledDate": "2026-09-20T09:00:00.000Z",
+      "location": "SMX Convention Center",
+      "price": 8000
+    },
+    {
+      "id": "5",
+      "clientId": 6,
+      "photographerId": 1,
+      "type": "Cosplay",
+      "status": 0,
+      "scheduledDate": "2026-10-04T09:00:00.000Z",
+      "location": "Fanime Con Booth",
+      "price": 9500
+    },
+    {
+      "clientId": 1,
+      "photographerId": 1,
+      "type": "Cosplay",
+      "status": 0,
+      "scheduledDate": "2026-08-19T11:46:15.994Z",
+      "location": "Anime Expo",
+      "price": 0,
+      "id": "VTdJGTaFhxY"
+    }
+  ],
+  "deliverables": [
+    {
+      "id": "1",
+      "shootId": 1,
+      "batchName": "Ceremony Highlights",
+      "status": "editing",
+      "fileCount": 42
+    },
+    {
+      "id": "2",
+      "shootId": 3,
+      "batchName": "Corporate Event Final",
+      "status": "delivered",
+      "fileCount": 120,
+      "deliveredAt": "2026-08-05T09:00:00.000Z"
+    },
+    {
+      "id": "3",
+      "shootId": 4,
+      "batchName": "Cosplay Con Set",
+      "status": "raw",
+      "fileCount": 68
+    }
+  ]
+}
