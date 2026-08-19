@@ -1,8 +1,8 @@
-import type { Shoot } from "../../types/index";
+import type { ApiShoot } from "../../types/index";
 import { ShootStatus } from "../../types/index"; // <-- NEW
 
 interface ShootCardProps {
-  shoot: Shoot;
+  shoot: ApiShoot;
   variant?: "default" | "compact";
 }
 

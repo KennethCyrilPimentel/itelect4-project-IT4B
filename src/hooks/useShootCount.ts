@@ -1,4 +1,4 @@
-import type { Shoot } from "../../types/index";
+import type { ApiShoot } from "../../types/index";
 import { ShootStatus } from "../../types/index";
 
 interface ShootCounts {
@@ -9,7 +9,7 @@ interface ShootCounts {
 }
 
 // Explicit return type: a fixed-shape object of counts, one per status
-function useShootCount(shoots: Shoot[]): ShootCounts {
+function useShootCount(shoots: ApiShoot[]): ShootCounts {
   return {
     requested: shoots.filter((s) => s.status === ShootStatus.Requested).length,
     confirmed: shoots.filter((s) => s.status === ShootStatus.Confirmed).length,

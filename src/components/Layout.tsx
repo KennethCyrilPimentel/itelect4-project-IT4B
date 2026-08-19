@@ -1,10 +1,13 @@
 // src/components/Layout.tsx
 import { NavLink, Outlet } from "react-router";
-import useToggle from "../hooks/useToggle";
 import useAuthStore from "../store/authStore";
+import useUiStore from "../store/uiStore"; // <-- NEW
+// useToggle import is GONE -- Layout does not own dark mode any more
 
 function Layout() {
-  const [isDarkMode, toggleDarkMode] = useToggle(false);
+  // WAS: const [isDarkMode, toggleDarkMode] = useToggle(false);
+  const isDarkMode = useUiStore((state) => state.isDarkMode);
+  const toggleDarkMode = useUiStore((state) => state.toggleDarkMode);
   const userName = useAuthStore((state) => state.userName);
   const logout = useAuthStore((state) => state.logout);
 

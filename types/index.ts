@@ -94,3 +94,23 @@ export const enum Role {
   Admin = "admin",
 }
 
+// ===== API TYPES (Session 7) =====
+// JSON has no Date, and json-server writes ids as strings. So what the
+// API hands back is NOT exactly the Shoot/Deliverable shape above.
+// Both types below are DERIVED from them, so Shoot/Deliverable stay the
+// single source of truth -- add a field there and these two inherit it.
+
+export type ApiShoot = Omit<Shoot, "id" | "scheduledDate"> & {
+  id: string;              // json-server ids look like "1" (a string)
+  scheduledDate: string;   // an ISO string, never a Date object
+};
+
+// What we SEND when creating one. No id yet -- the server makes it.
+export type NewShoot = Omit<ApiShoot, "id">;
+
+export type ApiDeliverable = Omit<Deliverable, "id" | "deliveredAt"> & {
+  id: string;
+  deliveredAt?: string;    // still optional, just a string now instead of a Date
+};
+
+export type NewDeliverable = Omit<ApiDeliverable, "id">;
