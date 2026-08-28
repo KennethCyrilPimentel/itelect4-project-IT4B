@@ -59,6 +59,16 @@
       "location": "Anime Expo",
       "price": 0,
       "id": "VTdJGTaFhxY"
+    },
+    {
+      "clientId": 1,
+      "photographerId": 1,
+      "type": "JJK Photoshoot",
+      "status": 0,
+      "scheduledDate": "2026-11-07T00:00:00.000Z",
+      "location": "Tagaytay",
+      "price": 0,
+      "id": "PW52RERPHQs"
     }
   ],
   "deliverables": [
@@ -84,5 +94,6 @@
       "status": "raw",
       "fileCount": 68
     }
-  ]
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
 }
