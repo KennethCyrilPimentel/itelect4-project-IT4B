@@ -31,6 +31,8 @@ const idleLink = `${base} text-gray-700 hover:bg-gray-200 dark:text-gray-300 dar
           <NavLink to="/deliverables" className={linkClass}>
             Deliverables
           </NavLink>
+          {/* GT5: the one page that talks to the AI */}
+          <NavLink to="/review" className={linkClass}>AI Review</NavLink>
 
           {userName === null ? (
             <NavLink to="/login" className={linkClass}>Login</NavLink>

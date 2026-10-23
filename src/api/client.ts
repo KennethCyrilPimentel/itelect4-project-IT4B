@@ -9,6 +9,7 @@ import type {
   AuthResponse,
   LoginBody,
   RegisterBody,
+  AiReview,
 } from "../../types/index";
 import useAuthStore from "../store/authStore";
 
@@ -111,5 +112,17 @@ export function createDeliverable(
   return request<ApiDeliverable>("/deliverables", {
     method: "POST",
     body: JSON.stringify(newDeliverable),
+  });
+}
+
+// ===== AI =====
+
+// POST /ai -> a review of the shoot description. Private like the shoots:
+// request() adds the token, and without it anyone could spend the Gemini
+// quota. The browser never talks to Gemini, only to our own backend.
+export function askAi(prompt: string): Promise<AiReview> {
+  return request<AiReview>("/ai", {
+    method: "POST",
+    body: JSON.stringify({ prompt }),
   });
 }

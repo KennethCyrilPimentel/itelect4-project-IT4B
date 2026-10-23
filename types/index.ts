@@ -145,3 +145,13 @@ export interface RegisterBody {
   email: string;
   password: string;
 }
+
+// What POST /api/ai sends back. Must match the Review type in the backend
+// (itelect4-backend/src/schemas/review.ts). Nothing checks that they agree,
+// so if you change one, change the other.
+export interface AiReview {
+  summary: string;
+  shotList: string[];
+  prepTips: string[];
+  difficulty: "easy" | "moderate" | "hard";
+}
