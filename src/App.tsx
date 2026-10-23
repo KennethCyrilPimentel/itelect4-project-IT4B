@@ -7,6 +7,7 @@ import ShootsPage from "./pages/ShootsPage";
 import ShootDetailPage from "./pages/ShootDetailPage";
 import LoginPage from "./pages/LoginPage";
 import DeliverablesPage from "./pages/DeliverablesPage";
+import ReviewPage from "./pages/ReviewPage"; // GT5
 import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
@@ -22,6 +23,8 @@ function App() {
           <Route path="shoots" element={<ShootsPage />} />
           <Route path="shoots/:id" element={<ShootDetailPage />} />
           <Route path="deliverables" element={<DeliverablesPage />} />
+          {/* GT5: behind the same guard, the API refuses it without a token */}
+          <Route path="review" element={<ReviewPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
