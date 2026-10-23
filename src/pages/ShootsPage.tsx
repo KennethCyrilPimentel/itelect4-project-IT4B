@@ -47,15 +47,13 @@ function ShootsPage() {
   });
 
   // handleSubmit only calls this after the schema passes.
+  // CHANGED: send ONLY what the backend asks for. The owner comes off the
+  // token, and the status starts as Requested on the server.
   const onSubmit = (values: ShootFormValues): void => {
     addShoot.mutate({
-      clientId: 1,
-      photographerId: 1,
       type: values.type,
-      status: 0, // ShootStatus.Requested
-      scheduledDate: new Date(values.scheduledDate).toISOString(),
       location: values.location,
-      price: 0,
+      scheduledDate: new Date(values.scheduledDate).toISOString(),
     });
   };
 
@@ -67,10 +65,11 @@ function ShootsPage() {
     return <div className="animate-pulse p-6 text-gray-500">Loading shoots...</div>;
   }
 
+  // CHANGED: the old message mentioned json-server on port 3001
   if (isError) {
     return (
       <div className="rounded-lg bg-red-50 p-4 text-red-700">
-        {error.message} -- is json-server running on port 3001?
+        {error.message}
       </div>
     );
   }
