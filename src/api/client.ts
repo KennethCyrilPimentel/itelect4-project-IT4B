@@ -1,80 +1,115 @@
 // src/api/client.ts
-// Every call to json-server lives in this one file.
+// Every call to the backend lives in this one file.
 import type {
   ApiShoot,
   NewShoot,
   ApiDeliverable,
   NewDeliverable,
+  ApiUser,
+  AuthResponse,
+  LoginBody,
+  RegisterBody,
 } from "../../types/index";
+import useAuthStore from "../store/authStore";
 
-export const API_URL = "http://localhost:3001";
+// Set in .env.local (and in Vercel for the deployed site)
+export const API_URL: string = import.meta.env.VITE_API_URL;
 
-// ===== SHOOTS =====
+// One helper does the boring parts for every call: build the URL, attach
+// the token if we have one, and turn a failed response into a readable Error.
+async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  const token = useAuthStore.getState().token;
 
-// GET /shoots -> the whole list
-export async function fetchShoots(): Promise<ApiShoot[]> {
-  const res = await fetch(`${API_URL}/shoots`);
+  const res = await fetch(`${API_URL}${path}`, {
+    ...options,
+    headers: {
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
   if (!res.ok) {
-    throw new Error("Could not load shoots");
+    // An expired or bad token: log out so ProtectedRoute sends us to /login
+    if (res.status === 401 && token) {
+      useAuthStore.getState().logout();
+    }
+
+    // The backend answers { message } (and { message, errors[] } for bad input)
+    let message = "Something went wrong";
+    try {
+      const body = await res.json();
+      message = Array.isArray(body.errors)
+        ? body.errors.join(", ")
+        : (body.message ?? message);
+    } catch {
+      // the body wasn't JSON, keep the default message
+    }
+    throw new Error(message);
+  }
+
+  // 204 = success with deliberately no body
+  if (res.status === 204) {
+    return undefined as T;
   }
   return res.json();
 }
 
-// POST /shoots -> the row the server saved, with the id it made
-export async function createShoot(newShoot: NewShoot): Promise<ApiShoot> {
-  const res = await fetch(`${API_URL}/shoots`, {
+// ===== AUTH =====
+
+export function registerUser(body: RegisterBody): Promise<ApiUser> {
+  return request<ApiUser>("/auth/register", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+}
+
+export function loginUser(body: LoginBody): Promise<AuthResponse> {
+  return request<AuthResponse>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(body),
+  });
+}
+
+// ===== SHOOTS =====
+
+// GET /shoots -> only this user's shoots
+export function fetchShoots(): Promise<ApiShoot[]> {
+  return request<ApiShoot[]>("/shoots");
+}
+
+// GET /shoots/:id -> one shoot
+export function fetchShootById(id: string): Promise<ApiShoot> {
+  return request<ApiShoot>(`/shoots/${id}`);
+}
+
+// POST /shoots -> the row the server saved, with the id it made
+export function createShoot(newShoot: NewShoot): Promise<ApiShoot> {
+  return request<ApiShoot>("/shoots", {
+    method: "POST",
     body: JSON.stringify(newShoot),
   });
-  if (!res.ok) {
-    throw new Error("Could not save the shoot");
-  }
-  return res.json();
 }
 
 // ===== DELIVERABLES =====
 
-// GET /deliverables -> the whole list
-export async function fetchDeliverables(): Promise<ApiDeliverable[]> {
-  const res = await fetch(`${API_URL}/deliverables`);
-  if (!res.ok) {
-    throw new Error("Could not load deliverables");
-  }
-  return res.json();
+// GET /deliverables -> all of this user's deliverables
+export function fetchDeliverables(): Promise<ApiDeliverable[]> {
+  return request<ApiDeliverable[]>("/deliverables");
 }
 
-// GET /deliverables?shootId=1 -> deliverables for ONE shoot (an array)
-export async function fetchDeliverablesByShootId(
-  shootId: number
+// GET /deliverables?shootId=abc -> deliverables for ONE shoot (an array)
+export function fetchDeliverablesByShootId(
+  shootId: string,
 ): Promise<ApiDeliverable[]> {
-  const res = await fetch(`${API_URL}/deliverables?shootId=${shootId}`);
-  if (!res.ok) {
-    throw new Error("Could not load deliverables for that shoot");
-  }
-  return res.json();
+  return request<ApiDeliverable[]>(`/deliverables?shootId=${shootId}`);
 }
 
 // POST /deliverables -> the row the server saved, with the id it made
-export async function createDeliverable(
-  newDeliverable: NewDeliverable
+export function createDeliverable(
+  newDeliverable: NewDeliverable,
 ): Promise<ApiDeliverable> {
-  const res = await fetch(`${API_URL}/deliverables`, {
+  return request<ApiDeliverable>("/deliverables", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(newDeliverable),
   });
-  if (!res.ok) {
-    throw new Error("Could not save the deliverable");
-  }
-  return res.json();
-}
-
-// GET /shoots/:id -> one shoot directly, no array wrapping needed
-export async function fetchShootById(id: string): Promise<ApiShoot> {
-  const res = await fetch(`${API_URL}/shoots/${id}`);
-  if (!res.ok) {
-    throw new Error(`No shoot found with id "${id}"`);
-  }
-  return res.json();
 }

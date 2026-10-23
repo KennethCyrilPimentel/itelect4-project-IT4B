@@ -1,9 +1,8 @@
 // src/pages/DeliverablesPage.tsx
-import { useQuery } from "@tanstack/react-query"; // <-- NEW
-import type { ApiDeliverable } from "../../types/index"; // <-- NEW
+import { useQuery } from "@tanstack/react-query";
+import type { ApiDeliverable } from "../../types/index";
 import DeliverableBadge from "../components/DeliverableBadge";
-import { fetchDeliverables } from "../api/client"; // <-- NEW
-// The mockData import is GONE -- allDeliverables no longer exists
+import { fetchDeliverables } from "../api/client";
 
 function DeliverablesPage() {
   const { data, isPending, isError, error } = useQuery<ApiDeliverable[]>({
@@ -15,10 +14,11 @@ function DeliverablesPage() {
     return <div className="animate-pulse p-6 text-gray-500">Loading deliverables...</div>;
   }
 
+  // CHANGED: the old message blamed json-server on port 3001
   if (isError) {
     return (
       <div className="rounded-lg bg-red-50 p-4 text-red-700">
-        {error.message} -- is json-server running on port 3001?
+        {error.message}
       </div>
     );
   }

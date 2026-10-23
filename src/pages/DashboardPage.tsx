@@ -1,28 +1,33 @@
 // src/pages/DashboardPage.tsx
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query"; // <-- NEW
-import type { User } from "../../types/index";
-import UserCard from "../components/UserCard";
+import { useQuery } from "@tanstack/react-query";
 import DeliverableBadge from "../components/DeliverableBadge";
 import useToggle from "../hooks/useToggle";
 import useShootCount from "../hooks/useShootCount";
-import { fetchShoots, fetchDeliverables } from "../api/client"; // <-- NEW
-import { photographer } from "../data/mockData"; // <-- allShoots/allDeliverables GONE
+import useAuthStore from "../store/authStore"; // NEW
+import { fetchShoots, fetchDeliverables } from "../api/client";
+// CHANGED: the mockData, User, UserCard and useState imports are GONE
 
 function DashboardPage() {
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showDetails, toggleDetails] = useToggle(false);
+
+  // NEW: the real logged-in user, from the store, instead of a hard-coded one
+  const token = useAuthStore((state) => state.token);
+  const userName = useAuthStore((state) => state.userName);
 
   // Same key ["shoots"] as ShootsPage -- shares the same cache entry,
   // so if that page already fetched it, this loads instantly.
+  // CHANGED: enabled only when logged in, because the API needs a token.
+  // Without it the request would just fail with a 401.
   const { data: shoots } = useQuery({
     queryKey: ["shoots"],
     queryFn: fetchShoots,
+    enabled: token !== null,
   });
 
   const { data: deliverables } = useQuery({
     queryKey: ["deliverables"],
     queryFn: fetchDeliverables,
+    enabled: token !== null,
   });
 
   // shoots may still be loading (undefined) on first visit to this page --
@@ -35,10 +40,12 @@ function DashboardPage() {
         Dashboard
       </h2>
 
-      <UserCard user={photographer} onSelect={setSelectedUser} />
-      {selectedUser && (
-        <p className="mt-2 dark:text-white">Selected: {selectedUser.name}</p>
-      )}
+      {/* CHANGED: was <UserCard user={photographer} ... /> */}
+      <p className="text-gray-700 dark:text-gray-300">
+        {userName === null
+          ? "Log in to see your shoots and deliverables."
+          : `Welcome back, ${userName}.`}
+      </p>
 
       <div className="mt-4 flex gap-4 text-sm text-gray-600 dark:text-gray-300">
         <p>Requested: {shootCounts.requested}</p>

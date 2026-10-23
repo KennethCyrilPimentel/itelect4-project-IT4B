@@ -94,23 +94,54 @@ export const enum Role {
   Admin = "admin",
 }
 
-// ===== API TYPES (Session 7) =====
-// JSON has no Date, and json-server writes ids as strings. So what the
-// API hands back is NOT exactly the Shoot/Deliverable shape above.
-// Both types below are DERIVED from them, so Shoot/Deliverable stay the
-// single source of truth -- add a field there and these two inherit it.
+// ===== API TYPES (Session 10) =====
+// These now describe what the REAL backend sends, not json-server.
+// Ids are strings (Mongo ObjectIds), dates are ISO strings, and a shoot's
+// photographer and price are optional because the request form doesn't set them.
 
-export type ApiShoot = Omit<Shoot, "id" | "scheduledDate"> & {
-  id: string;              // json-server ids look like "1" (a string)
-  scheduledDate: string;   // an ISO string, never a Date object
-};
-
-// What we SEND when creating one. No id yet -- the server makes it.
-export type NewShoot = Omit<ApiShoot, "id">;
-
-export type ApiDeliverable = Omit<Deliverable, "id" | "deliveredAt"> & {
+export type ApiShoot = Omit<
+  Shoot,
+  "id" | "clientId" | "photographerId" | "scheduledDate" | "price"
+> & {
   id: string;
-  deliveredAt?: string;    // still optional, just a string now instead of a Date
+  clientId: string;
+  photographerId?: string;
+  scheduledDate: string; // an ISO string, never a Date object
+  price?: number;
 };
 
-export type NewDeliverable = Omit<ApiDeliverable, "id">;
+// What we SEND when creating a shoot. Nothing else: the server reads the
+// owner off the token and sets the status itself.
+export type NewShoot = Pick<ApiShoot, "type" | "location" | "scheduledDate">;
+
+export type ApiDeliverable = Omit<Deliverable, "id" | "shootId" | "deliveredAt"> & {
+  id: string;
+  shootId: string;      // a shoot's id, which is now a string
+  deliveredAt?: string; // still optional, just a string now instead of a Date
+};
+
+// What we SEND when creating a deliverable. status is optional (defaults to "raw").
+export type NewDeliverable = Pick<
+  ApiDeliverable,
+  "shootId" | "batchName" | "fileCount"
+> &
+  Partial<Pick<ApiDeliverable, "status">>;
+
+// ===== AUTH TYPES (Session 10) =====
+export type ApiUser = Omit<User, "id" | "faqs"> & { id: string };
+
+export interface AuthResponse {
+  token: string;
+  user: ApiUser;
+}
+
+export interface LoginBody {
+  email: string;
+  password: string;
+}
+
+export interface RegisterBody {
+  name: string;
+  email: string;
+  password: string;
+}
